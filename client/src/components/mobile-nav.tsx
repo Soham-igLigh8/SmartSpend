@@ -75,14 +75,14 @@ export default function MobileNav({ isOpen, setIsOpen }: MobileNavProps) {
                 </ul>
               </nav>
               
-              <div className="pt-4 border-t border-[#EBECF0] mt-auto">
+              <div className="pt-4 border-t border-[#EBECF0] dark:border-gray-700 mt-auto">
                 <div className="flex items-center">
-                  <div className="w-10 h-10 rounded-full bg-[#EBECF0] flex items-center justify-center text-[#172B4D]">
+                  <div className="w-10 h-10 rounded-full bg-[#EBECF0] dark:bg-gray-700 flex items-center justify-center text-[#172B4D] dark:text-gray-200">
                     <i className="fas fa-user"></i>
                   </div>
                   <div className="ml-3">
-                    <p className="font-medium">Alex Morgan</p>
-                    <p className="text-sm text-gray-500">alex@example.com</p>
+                    <p className="font-medium dark:text-gray-100">Alex Morgan</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">alex@example.com</p>
                   </div>
                 </div>
               </div>

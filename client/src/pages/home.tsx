@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,10 +8,16 @@ import AccountCard from "@/components/account-card";
 import SpendingChart from "@/components/spending-chart";
 import SavingsGoal from "@/components/savings-goal";
 import FinancialChat from "@/components/financial-chat";
+import FinancialHealthMeter from "@/components/financial-health-meter";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Home() {
   const isMobile = useIsMobile();
+  const { toast } = useToast();
+  
+  // State for financial health score
+  const [healthScore, setHealthScore] = useState(72);
   
   // Using a fixed user ID for demo purposes - in a real app this would come from authentication
   const userId = 1;
@@ -30,6 +36,22 @@ export default function Home() {
   const { data: savingsGoals, isLoading: isLoadingSavingsGoals } = useQuery<any[]>({
     queryKey: [`/api/savings-goals/${userId}`],
   });
+  
+  // Handle health score change with toast notification
+  const handleHealthScoreChange = (newScore: number) => {
+    const oldScore = healthScore;
+    setHealthScore(newScore);
+    
+    // Show toast with score change info
+    const scoreDiff = newScore - oldScore;
+    const isImproved = scoreDiff > 0;
+    
+    toast({
+      title: isImproved ? "Financial health improved!" : "Financial health decreased",
+      description: `Your score ${isImproved ? 'increased' : 'decreased'} by ${Math.abs(scoreDiff)} points.`,
+      variant: isImproved ? "default" : "destructive",
+    });
+  };
 
   // Helper function to format account dates from strings to Date objects
   const formatAccounts = (accounts: any[]) => {
@@ -114,6 +136,12 @@ export default function Home() {
             ))}
           </div>
         )}
+      </div>
+      
+      {/* Financial Health Meter */}
+      <div className="mb-8">
+        <h2 className="text-xl font-semibold mb-4">Financial Health</h2>
+        <FinancialHealthMeter score={healthScore} onChange={handleHealthScoreChange} />
       </div>
       
       {/* Financial Insights */}
