@@ -1,7 +1,7 @@
 import express, { type Express, Router } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { chatRequestSchema, insertChatMessageSchema } from "@shared/schema";
+import { chatRequestSchema, insertChatMessageSchema, userProfileUpdateSchema } from "@shared/schema";
 import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
 import { ZodError } from "zod";
@@ -32,6 +32,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Remove password from response
       const { password, ...userWithoutPassword } = user;
+      res.json(userWithoutPassword);
+    } catch (err: any) {
+      handleError(err, res);
+    }
+  });
+  
+  apiRouter.patch("/users/:id/profile", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const user = await storage.getUser(id);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const updates = userProfileUpdateSchema.parse(req.body);
+      const updatedUser = await storage.updateUser(id, updates);
+      
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Remove password from response
+      const { password, ...userWithoutPassword } = updatedUser;
       res.json(userWithoutPassword);
     } catch (err: any) {
       handleError(err, res);

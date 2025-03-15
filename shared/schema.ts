@@ -8,6 +8,8 @@ export const users = pgTable("users", {
   password: text("password").notNull(),
   name: text("name").notNull(),
   email: text("email").notNull(),
+  monthlyIncome: real("monthly_income"),
+  riskTolerance: text("risk_tolerance"), // "low", "medium", "high"
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -80,3 +82,11 @@ export const chatRequestSchema = z.object({
 });
 
 export type ChatRequest = z.infer<typeof chatRequestSchema>;
+
+// User profile update schema
+export const userProfileUpdateSchema = z.object({
+  monthlyIncome: z.number().optional(),
+  riskTolerance: z.enum(['low', 'medium', 'high']).optional(),
+});
+
+export type UserProfileUpdate = z.infer<typeof userProfileUpdateSchema>;

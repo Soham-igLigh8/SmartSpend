@@ -37,12 +37,19 @@ function getChatHistory(userId: number): ChatMessageHistory {
   return chatHistories[userId];
 }
 
-// Create a default user profile
-// In a real application, this would come from a user's financial data
-const defaultUserProfile = {
-  "monthly_investment": 5000,
-  "risk_tolerance": "medium"
-};
+// Get user's financial profile from the storage
+async function getUserProfile(userId: number) {
+  // Import here to avoid circular dependency
+  const { storage } = await import('./storage');
+  
+  const user = await storage.getUser(userId);
+  
+  // Use user's profile if available, otherwise use defaults
+  return {
+    "monthly_income": user?.monthlyIncome || 5000,
+    "risk_tolerance": user?.riskTolerance || "medium"
+  };
+}
 
 export async function generateAIResponse(message: string, userId: number): Promise<string> {
   try {
