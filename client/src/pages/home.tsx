@@ -17,17 +17,17 @@ export default function Home() {
   const userId = 1;
   
   // Fetch user data
-  const { data: user, isLoading: isLoadingUser } = useQuery({
+  const { data: user, isLoading: isLoadingUser } = useQuery<any>({
     queryKey: [`/api/users/${userId}`],
   });
   
   // Fetch accounts
-  const { data: accounts, isLoading: isLoadingAccounts } = useQuery({
+  const { data: accounts, isLoading: isLoadingAccounts } = useQuery<any[]>({
     queryKey: [`/api/accounts/${userId}`],
   });
   
   // Fetch savings goals
-  const { data: savingsGoals, isLoading: isLoadingSavingsGoals } = useQuery({
+  const { data: savingsGoals, isLoading: isLoadingSavingsGoals } = useQuery<any[]>({
     queryKey: [`/api/savings-goals/${userId}`],
   });
 
@@ -102,7 +102,7 @@ export default function Home() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {formatAccounts(accounts || []).map((account: any) => (
+            {Array.isArray(accounts) && formatAccounts(accounts).map((account: any) => (
               <AccountCard
                 key={account.id}
                 name={account.name}
@@ -148,7 +148,7 @@ export default function Home() {
                 </>
               ) : (
                 <>
-                  {savingsGoals?.map((goal: any) => (
+                  {Array.isArray(savingsGoals) && savingsGoals.map((goal: any) => (
                     <SavingsGoal
                       key={goal.id}
                       name={goal.name}

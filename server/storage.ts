@@ -156,7 +156,11 @@ export class MemStorage implements IStorage {
   
   async createAccount(insertAccount: InsertAccount): Promise<Account> {
     const id = this.currentAccountId++;
-    const account: Account = { ...insertAccount, id };
+    const account: Account = { 
+      ...insertAccount, 
+      id,
+      lastTransaction: insertAccount.lastTransaction || null 
+    };
     this.accounts.set(id, account);
     return account;
   }
@@ -202,7 +206,13 @@ export class MemStorage implements IStorage {
   async getChatMessages(userId: number): Promise<ChatMessage[]> {
     return Array.from(this.chatMessages.values())
       .filter((message) => message.userId === userId)
-      .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+      .sort((a, b) => {
+        // Make sure timestamps exist before comparing
+        if (!a.timestamp && !b.timestamp) return 0;
+        if (!a.timestamp) return -1;
+        if (!b.timestamp) return 1;
+        return a.timestamp.getTime() - b.timestamp.getTime();
+      });
   }
   
   async createChatMessage(insertMessage: InsertChatMessage): Promise<ChatMessage> {
