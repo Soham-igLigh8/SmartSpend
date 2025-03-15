@@ -86,10 +86,13 @@ export async function generateAIResponse(message: string, userId: number): Promi
       historyMessagesKey: "history",
     });
     
+    // Get user's financial profile
+    const userProfile = await getUserProfile(userId);
+    
     // Invoke the chain with history
     const response = await runnableWithHistory.invoke(
       {
-        userProfile: JSON.stringify(defaultUserProfile),
+        userProfile: JSON.stringify(userProfile),
         investmentOptions: JSON.stringify(investmentOptions),
         input: message,
         history: "" // This will be filled by RunnableWithMessageHistory
