@@ -6,6 +6,7 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import Assistant from "@/pages/assistant";
 import Accounts from "@/pages/accounts";
+import Profile from "@/pages/profile";
 import Sidebar from "@/components/sidebar";
 import MobileNav from "@/components/mobile-nav";
 import { useState, useEffect } from "react";
@@ -17,6 +18,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/assistant" component={Assistant} />
       <Route path="/accounts" component={Accounts} />
+      <Route path="/profile" component={Profile} />
       <Route component={NotFound} />
     </Switch>
   );

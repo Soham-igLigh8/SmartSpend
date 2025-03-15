@@ -18,6 +18,7 @@ export default function MobileNav({ isOpen, setIsOpen }: MobileNavProps) {
     { href: "/accounts", label: "Accounts", icon: "fas fa-wallet" },
     { href: "/investments", label: "Investments", icon: "fas fa-chart-pie" },
     { href: "/reports", label: "Reports", icon: "fas fa-file-invoice-dollar" },
+    { href: "/profile", label: "Profile", icon: "fas fa-user-cog" },
   ];
 
   return (
