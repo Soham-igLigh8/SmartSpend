@@ -84,7 +84,8 @@ export async function generateAIResponse(message: string, userId: number): Promi
       {
         userProfile: JSON.stringify(defaultUserProfile),
         investmentOptions: JSON.stringify(investmentOptions),
-        input: message
+        input: message,
+        history: "" // This will be filled by RunnableWithMessageHistory
       },
       {
         configurable: {
@@ -93,8 +94,14 @@ export async function generateAIResponse(message: string, userId: number): Promi
       }
     );
     
-    // Return the response content
-    return response.content.toString();
+    // Return the response content - handle different response types
+    if (typeof response === 'string') {
+      return response;
+    } else if (response && typeof response === 'object' && 'content' in response) {
+      return response.content.toString();
+    } else {
+      return "I processed your request but encountered an unexpected response format.";
+    }
   } catch (error) {
     console.error("Error generating AI response:", error);
     return "I encountered an error while processing your request. Please try again later.";
