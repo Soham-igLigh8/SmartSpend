@@ -1,0 +1,120 @@
+# Install required libraries
+!pip install -q langchain langchain-community google-generativeai langchain-google-genai
+
+# Import libraries
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain.prompts import PromptTemplate
+from langchain_core.runnables import RunnableWithMessageHistory
+from langchain_core.chat_history import InMemoryChatMessageHistory
+from IPython.display import display, Markdown
+import textwrap
+import time
+
+# Replace with your Gemini API key
+GOOGLE_API_KEY = "your_actual_api_key_here"  # Replace this!
+if GOOGLE_API_KEY == "YOUR_GEMINI_API_KEY_HERE":
+    raise ValueError("Please replace the API key with your actual Gemini API key!")
+
+# Mock financial data
+investment_options = {
+    "SBI Bluechip Fund": {"type": "Mutual Fund", "risk": "Medium", "avg_return": "10%", "min_investment": 5000},
+    "HDFC Small Cap Fund": {"type": "Mutual Fund", "risk": "High", "avg_return": "12%", "min_investment": 5000},
+    "NIFTY 50 Index Fund": {"type": "Mutual Fund", "risk": "Low", "avg_return": "8%", "min_investment": 1000},
+    "Axis Long Term Equity Fund": {"type": "Mutual Fund", "risk": "Medium", "avg_return": "11%", "min_investment": 5000}
+}
+
+# Function to format Markdown output in Colab
+def to_markdown(text):
+    text = text.replace('•', '  *')
+    return Markdown(textwrap.indent(text, '> ', predicate=lambda _: True))
+
+# Custom prompt template
+prompt_template = """
+You are a financial assistant designed for beginners in India. Your goal is to provide simple, accurate, and helpful advice about investing. Use beginner-friendly language and focus on the Indian market (e.g., mutual funds, SIPs, stocks). If the user asks for investment suggestions, use the provided user profile and investment options to recommend specific products. If you don’t have enough info, ask the user for clarification.
+
+Conversation history: {history}
+User profile: {user_profile}
+Investment options: {investment_options}
+
+User input: {input}
+Answer:
+"""
+
+# Financial Assistant Class
+class FinancialAssistant:
+    def __init__(self):
+        # Initialize Gemini model (try gemini-1.5-pro)
+        self.llm = ChatGoogleGenerativeAI(model="gemini-1.5-pro", google_api_key=GOOGLE_API_KEY, temperature=0.7)
+
+        # Set up prompt
+        self.prompt = PromptTemplate(
+            input_variables=["history", "user_profile", "investment_options", "input"],
+            template=prompt_template
+        )
+
+        # Chat history storage
+        self.chat_history = InMemoryChatMessageHistory()
+
+        # Create runnable chain with history
+        self.chain = self.prompt | self.llm
+        self.runnable_with_history = RunnableWithMessageHistory(
+            runnable=self.chain,
+            get_session_history=lambda session_id: self.chat_history,
+            input_messages_key="input",
+            history_messages_key="history"
+        )
+
+        # User profile
+        self.user_profile = {"monthly_investment": None, "risk_tolerance": None}
+
+    def ask_profile_questions(self):
+        print("Let’s get to know you better!")
+        self.user_profile["monthly_investment"] = int(input("How much can you invest monthly (in ₹)? "))
+        self.user_profile["risk_tolerance"] = input("Are you okay with high risk (yes/no)? ").lower()
+        self.chat_history.add_user_message(f"User profile updated: Monthly investment = ₹{self.user_profile['monthly_investment']}, Risk tolerance = {self.user_profile['risk_tolerance']}")
+
+    def suggest_investment(self):
+        budget = self.user_profile["monthly_investment"]
+        risk = "High" if self.user_profile["risk_tolerance"] == "yes" else "Low/Medium"
+        suggestions = []
+        for name, details in investment_options.items():
+            if budget >= details["min_investment"] and (risk == "High" or details["risk"] != "High"):
+                suggestions.append(f"{name} ({details['type']}, Risk: {details['risk']}, Avg Return: {details['avg_return']})")
+        return suggestions if suggestions else ["No suitable options found for your profile."]
+
+    def chat(self):
+        print("Welcome to your GenAI Financial Assistant! Type 'exit' to stop.")
+        self.ask_profile_questions()  # Initial profiling
+
+        while True:
+            user_input = input("\nAsk me anything about investing: ")
+            if user_input.lower() == "exit":
+                print("Goodbye!")
+                break
+
+            # Handle suggestions manually
+            if "suggest" in user_input.lower() or "recommend" in user_input.lower():
+                suggestions = self.suggest_investment()
+                response = "Based on your profile, here are some options:\n" + "\n".join(suggestions)
+            else:
+                # Use LangChain with history
+                response = self.runnable_with_history.invoke(
+                    {
+                        "user_profile": str(self.user_profile),
+                        "investment_options": str(investment_options),
+                        "input": user_input
+                    },
+                    config={"configurable": {"session_id": "user1"}}
+                ).content
+
+            # Display response in Markdown
+            display(to_markdown(response))
+            time.sleep(1)  # Small delay for readability
+
+# Run the assistant
+if __name__ == "__main__":
+    try:
+        assistant = FinancialAssistant()
+        assistant.chat()
+    except Exception as e:
+        print(f"Error: {str(e)}")
