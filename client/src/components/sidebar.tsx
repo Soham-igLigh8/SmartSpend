@@ -1,5 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export default function Sidebar() {
   const [location] = useLocation();
@@ -14,14 +15,15 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside className="hidden md:flex flex-col w-64 bg-white border-r border-[#EBECF0]">
-      <div className="p-6 border-b border-[#EBECF0]">
+    <aside className="hidden md:flex flex-col w-64 bg-white dark:bg-gray-800 border-r border-[#EBECF0] dark:border-gray-700 transition-colors duration-200">
+      <div className="p-6 border-b border-[#EBECF0] flex justify-between items-center">
         <h1 className="text-xl font-semibold flex items-center">
           <span className="bg-[#0052CC] text-white p-1 rounded mr-2">
             <i className="fas fa-chart-line"></i>
           </span>
           FinAssist
         </h1>
+        <ThemeToggle />
       </div>
       
       <nav className="flex-1 py-4">

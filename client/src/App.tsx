@@ -11,6 +11,7 @@ import Sidebar from "@/components/sidebar";
 import MobileNav from "@/components/mobile-nav";
 import { useState, useEffect } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { ThemeProvider } from "@/hooks/use-theme";
 
 function Router() {
   return (
@@ -29,21 +30,23 @@ function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <div className="min-h-screen flex flex-col md:flex-row bg-neutral-100 text-[#172B4D]">
-        {!isMobile && <Sidebar />}
-        {isMobile && (
-          <MobileNav 
-            isOpen={mobileMenuOpen} 
-            setIsOpen={setMobileMenuOpen} 
-          />
-        )}
-        <main className="flex-1 flex flex-col">
-          <Router />
-        </main>
-      </div>
-      <Toaster />
-    </QueryClientProvider>
+    <ThemeProvider defaultTheme="system">
+      <QueryClientProvider client={queryClient}>
+        <div className="min-h-screen flex flex-col md:flex-row bg-neutral-100 dark:bg-gray-900 text-[#172B4D] dark:text-gray-100 transition-colors duration-200">
+          {!isMobile && <Sidebar />}
+          {isMobile && (
+            <MobileNav 
+              isOpen={mobileMenuOpen} 
+              setIsOpen={setMobileMenuOpen} 
+            />
+          )}
+          <main className="flex-1 flex flex-col">
+            <Router />
+          </main>
+        </div>
+        <Toaster />
+      </QueryClientProvider>
+    </ThemeProvider>
   );
 }
 
