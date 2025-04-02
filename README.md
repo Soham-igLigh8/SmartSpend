@@ -1,0 +1,1 @@
+Our AI, powered by Google Gemini, chats naturally—‘SIPs are piggy banks’—while LangChain remembers your ₹500 goal. Custom prompts educate (‘Stocks spread risk’) and suggest (NIFTY 50). Built on Indian data, it scales to millions, delivering clear text/tables. Judges, it’s a tutor for India’s 100M newbies.
